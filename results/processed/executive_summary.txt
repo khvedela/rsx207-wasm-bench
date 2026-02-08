@@ -1,0 +1,28 @@
+================================================================================
+WASM BENCHMARK EXECUTIVE SUMMARY
+================================================================================
+
+KEY FINDINGS:
+--------------------------------------------------------------------------------
+
+1. Cold Start Performance:
+   - Native:   150.28 ms (fastest)
+   - Docker:   192.78 ms (1.28x slower)
+   - Wasmtime:  51.52 ms (0.34x slower)
+
+2. HTTP Throughput:
+   - docker    :    604.5 req/s
+   - native    :    694.1 req/s
+   - wasmtime  :    687.0 req/s
+
+3. Memory Usage:
+   - docker    :    1.4 MB
+   - native    :    1.8 MB
+   - wasmtime  :   22.7 MB
+
+4. CPU-Bound Performance (relative to native):
+   - docker    : +139.1% overhead
+   - wasmedge  : +12117.5% overhead
+   - wasmtime  : +20.2% overhead
+
+================================================================================

@@ -1,0 +1,71 @@
+\begin{table}[h]
+\centering
+\caption{Benchmark Results Summary}
+\label{tab:benchmark_summary}
+\begin{tabular}{lrrrr}
+\hline
+\multicolumn{5}{c}{\textbf{Cold Start}} \\
+\hline
+Runtime & Mean & Median & Std Dev & Min \\
+\hline
+docker & 192.78 & 180.03 & 51.27 & 129.69 \\
+native & 150.28 & 14.53 & 517.04 & 12.54 \\
+wasmtime & 51.52 & 37.39 & 24.45 & 33.80 \\
+\hline
+\end{tabular}
+\vspace{1em}
+
+\begin{tabular}{lrrrr}
+\hline
+\multicolumn{5}{c}{\textbf{HTTP Latency (p50)}} \\
+\hline
+Runtime & Mean & Median & Std Dev & Min \\
+\hline
+docker & 13.53 & 12.84 & 2.45 & 10.50 \\
+native & 11.61 & 11.22 & 1.50 & 9.49 \\
+wasmtime & 11.71 & 11.37 & 1.57 & 9.50 \\
+\hline
+\end{tabular}
+\vspace{1em}
+
+\begin{tabular}{lrrrr}
+\hline
+\multicolumn{5}{c}{\textbf{HTTP Throughput}} \\
+\hline
+Runtime & Mean & Median & Std Dev & Min \\
+\hline
+docker & 604.51 & 612.24 & 90.34 & 296.90 \\
+native & 694.14 & 720.88 & 87.92 & 462.97 \\
+wasmtime & 687.00 & 702.57 & 70.97 & 331.92 \\
+\hline
+\end{tabular}
+\vspace{1em}
+
+\begin{tabular}{lrrrr}
+\hline
+\multicolumn{5}{c}{\textbf{Memory Usage}} \\
+\hline
+Runtime & Mean & Median & Std Dev & Min \\
+\hline
+docker & 1.36 & 0.87 & 0.99 & 0.86 \\
+native & 1.82 & 1.83 & 0.01 & 1.81 \\
+wasmtime & 22.68 & 19.31 & 8.91 & 19.14 \\
+\hline
+\end{tabular}
+\vspace{1em}
+
+\begin{tabular}{lrrrr}
+\hline
+\multicolumn{5}{c}{\textbf{CPU Hash Performance}} \\
+\hline
+Runtime & Mean & Median & Std Dev & Min \\
+\hline
+docker & 386.68 & 371.64 & 41.08 & 337.65 \\
+native & 161.73 & 148.93 & 58.10 & 139.66 \\
+wasmedge & 19758.90 & 20012.10 & 1865.08 & 18158.54 \\
+wasmtime & 194.43 & 165.62 & 121.76 & 148.01 \\
+\hline
+\end{tabular}
+\vspace{1em}
+
+\end{table}

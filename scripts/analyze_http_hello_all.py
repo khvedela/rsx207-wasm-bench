@@ -10,8 +10,8 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 RUNTIMES = {
     "native": ROOT_DIR / "results" / "raw" / "native" / "http-hello",
     "docker": ROOT_DIR / "results" / "raw" / "docker" / "http-hello",
-    "wasmcloud_full": ROOT_DIR / "results" / "raw" / "wasmcloud" / "http-hello",
-    "wasmcloud_comp": ROOT_DIR / "results" / "raw" / "wasmcloud-component" / "http-hello",
+    "wasmcloud": ROOT_DIR / "results" / "raw" / "wasmcloud" / "http-hello",
+    "wasmtime": ROOT_DIR / "results" / "raw" / "wasmtime" / "http-hello",
 }
 
 OUT_DIR = ROOT_DIR / "results" / "processed"
@@ -22,6 +22,8 @@ COLD_START_PATTERN = re.compile(r"cold_start_ms=(\d+\.?\d*)")
 LATENCY_PATTERN = re.compile(
     r"req=(\d+)\s+http_code=(\d{3})\s+latency_ns=(\d+)\s+latency_ms=(\d+\.?\d*)"
 )
+RESOURCE_PATTERN = re.compile(r"rss_kb=(\d+)\s+cpu_pct=([0-9.]+)")
+THROUGHPUT_PATTERN = re.compile(r"throughput_rps=([0-9.]+)")
 
 
 def parse_run_log(path: Path):
@@ -32,6 +34,9 @@ def parse_run_log(path: Path):
 
     cold_start_ms = None
     latencies_ms = []
+    rss_kb = None
+    cpu_pct = None
+    throughput_rps = None
 
     with path.open("r") as f:
         for line in f:
@@ -48,6 +53,15 @@ def parse_run_log(path: Path):
                 if http_code == 200:
                     latencies_ms.append(latency_ms)
 
+            m_res = RESOURCE_PATTERN.search(line)
+            if m_res:
+                rss_kb = int(m_res.group(1))
+                cpu_pct = float(m_res.group(2))
+
+            m_tp = THROUGHPUT_PATTERN.search(line)
+            if m_tp:
+                throughput_rps = float(m_tp.group(1))
+
     if cold_start_ms is None or not latencies_ms:
         return None
 
@@ -55,6 +69,9 @@ def parse_run_log(path: Path):
         "run_id": run_id,
         "cold_start_ms": cold_start_ms,
         "latencies_ms": latencies_ms,
+        "rss_kb": rss_kb,
+        "cpu_pct": cpu_pct,
+        "throughput_rps": throughput_rps,
     }
 
 
@@ -96,13 +113,31 @@ def main():
         cs = [r["cold_start_ms"] for r in runs]
         all_lat = [x for r in runs for x in r["latencies_ms"]]
         lat_stats = agg_latencies(all_lat)
+        rss_vals = [r["rss_kb"] for r in runs if r.get("rss_kb") is not None]
+        tp_vals = [r["throughput_rps"] for r in runs if r.get("throughput_rps") is not None]
+        rss_mean = statistics.mean(rss_vals) if rss_vals else None
+        tp_mean = statistics.mean(tp_vals) if tp_vals else None
+        rss_mean_str = f"{rss_mean:.0f}" if rss_mean is not None else "NA"
+        tp_mean_str = f"{tp_mean:.1f}" if tp_mean is not None else "NA"
+        density_str = "NA"
+        if rss_mean and rss_mean > 0:
+            density = (1024 * 1024) / rss_mean
+            density_str = f"{density:.1f}"
+        efficiency_str = "NA"
+        if rss_mean and rss_mean > 0 and tp_mean:
+            efficiency = tp_mean / (rss_mean / 1024)
+            efficiency_str = f"{efficiency:.2f}"
         print(
             f"- {rt}: "
             f"cold_start_ms mean={statistics.mean(cs):.3f}, "
             f"min={min(cs):.3f}, max={max(cs):.3f}; "
             f"latency_ms mean={lat_stats['mean']:.3f}, "
             f"p50={lat_stats['median']:.3f}, "
-            f"min={lat_stats['min']:.3f}, max={lat_stats['max']:.3f}"
+            f"min={lat_stats['min']:.3f}, max={lat_stats['max']:.3f}; "
+            f"rss_kb mean={rss_mean_str} (n={len(rss_vals)}) "
+            f"throughput_rps mean={tp_mean_str} (n={len(tp_vals)}) "
+            f"est_instances_per_gb={density_str} "
+            f"rps_per_mb={efficiency_str}"
         )
 
     # Cold start comparison bar chart
@@ -146,6 +181,50 @@ def main():
     out_lat = OUT_DIR / "http_hello_latency_boxplot_by_runtime.png"
     plt.savefig(out_lat, bbox_inches="tight")
     print(f"Saved latency comparison to {out_lat}")
+
+    # Throughput bar chart
+    tp_runtimes = []
+    tp_means = []
+    for rt, runs in data.items():
+        tps = [r["throughput_rps"] for r in runs if r.get("throughput_rps") is not None]
+        if not tps:
+            continue
+        tp_runtimes.append(rt)
+        tp_means.append(statistics.mean(tps))
+
+    if tp_runtimes:
+        x = range(len(tp_runtimes))
+        plt.figure()
+        plt.bar(x, tp_means)
+        plt.xticks(x, tp_runtimes)
+        plt.ylabel("Throughput (req/s)")
+        plt.title("HTTP hello throughput – mean per runtime")
+        plt.grid(axis="y", alpha=0.3)
+        out_tp = OUT_DIR / "http_hello_throughput_mean_by_runtime.png"
+        plt.savefig(out_tp, bbox_inches="tight")
+        print(f"Saved throughput comparison to {out_tp}")
+
+    # Memory usage bar chart
+    mem_runtimes = []
+    mem_means = []
+    for rt, runs in data.items():
+        rss_vals = [r["rss_kb"] for r in runs if r.get("rss_kb") is not None]
+        if not rss_vals:
+            continue
+        mem_runtimes.append(rt)
+        mem_means.append(statistics.mean(rss_vals))
+
+    if mem_runtimes:
+        x = range(len(mem_runtimes))
+        plt.figure()
+        plt.bar(x, mem_means)
+        plt.xticks(x, mem_runtimes)
+        plt.ylabel("RSS (KB)")
+        plt.title("HTTP hello memory footprint – mean per runtime")
+        plt.grid(axis="y", alpha=0.3)
+        out_mem = OUT_DIR / "http_hello_rss_mean_by_runtime.png"
+        plt.savefig(out_mem, bbox_inches="tight")
+        print(f"Saved memory comparison to {out_mem}")
 
 
 if __name__ == "__main__":

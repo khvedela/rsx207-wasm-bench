@@ -32,6 +32,12 @@ wash dev
 curl http://127.0.0.1:8000
 ```
 
+Stateful endpoint:
+
+```shell
+curl http://127.0.0.1:8000/state
+```
+
 ## Adding Capabilities
 
 To learn how to extend this example with additional capabilities, see the [Adding Capabilities](https://wasmcloud.com/docs/tour/adding-capabilities?lang=rust) section of the wasmCloud documentation.

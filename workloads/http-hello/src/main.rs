@@ -1,6 +1,8 @@
 use std::str::FromStr;
-use std::thread;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tiny_http::{Header, Response, Server};
+
+static COUNTER: AtomicU64 = AtomicU64::new(0);
 
 fn main() {
     // Bind HTTP server
@@ -10,20 +12,22 @@ fn main() {
 
     // Handle incoming requests forever
     for request in server.incoming_requests() {
-        let url = request.url().to_string();
-        let method = request.method().as_str().to_string();
-
         // Explicitly build a tiny_http::Header
         let content_type =
             Header::from_str("Content-Type: text/plain; charset=utf-8").expect("invalid header");
 
-        let response = Response::from_string("hello").with_header(content_type);
+        let path = request.url();
+        let body = if path.starts_with("/state") {
+            let next = COUNTER.fetch_add(1, Ordering::Relaxed) + 1;
+            next.to_string()
+        } else {
+            "hello".to_string()
+        };
 
-        // Offload response to a short-lived thread so we don't block the loop
-        thread::spawn(move || {
-            if let Err(e) = request.respond(response) {
-                eprintln!("[http-hello] error responding to {} {}: {}", method, url, e);
-            }
-        });
+        let response = Response::from_string(body).with_header(content_type);
+
+        if let Err(e) = request.respond(response) {
+            eprintln!("[http-hello] error responding: {}", e);
+        }
     }
 }

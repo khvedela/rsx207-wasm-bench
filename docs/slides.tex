@@ -1,0 +1,239 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{pgfpages}
+
+% Uncomment to print notes:
+% \setbeameroption{show notes on second screen=right}
+
+\graphicspath{{../results/processed/}}
+
+% CNAM-inspired palette (adjust if you have official values).
+\definecolor{CnamBlue}{HTML}{003A70}
+\definecolor{CnamBlueDark}{HTML}{002A52}
+\definecolor{CnamRed}{HTML}{C8102E}
+\definecolor{CnamGray}{HTML}{F2F4F8}
+
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=CnamBlue}
+\setbeamercolor{frametitle}{fg=white,bg=CnamBlue}
+\setbeamercolor{title}{fg=white,bg=CnamBlue}
+\setbeamercolor{subtitle}{fg=white,bg=CnamBlue}
+\setbeamercolor{footline}{fg=white,bg=CnamBlueDark}
+\setbeamercolor{block title}{fg=white,bg=CnamBlue}
+\setbeamercolor{block body}{bg=CnamGray}
+\setbeamercolor{alerted text}{fg=CnamRed}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.1ex,left]{frametitle}
+    \hspace*{1ex}\insertframetitle
+  \end{beamercolorbox}
+}
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.4ex,dp=1ex,left]{footline}
+      \hspace*{1ex}\insertshorttitle\hfill\insertframenumber/\inserttotalframenumber\hspace*{1ex}
+    \end{beamercolorbox}
+  }
+}
+
+\setbeamerfont{title}{series=\bfseries}
+\setbeamerfont{frametitle}{series=\bfseries}
+
+\newcommand{\plotfull}[1]{%
+  \includegraphics[width=0.9\linewidth,height=0.62\textheight,keepaspectratio]{#1}%
+}
+\newcommand{\plotside}[1]{%
+  \includegraphics[width=\linewidth,height=0.38\textheight,keepaspectratio]{#1}%
+}
+\newcommand{\takeaway}[1]{%
+  \vspace{0.4em}\footnotesize\textcolor{CnamBlueDark}{#1}%
+}
+
+\title[Wasm Bench]{WebAssembly, wasmCloud, and Containers}
+\subtitle{Reproducible Benchmark Study (RSX207 Project 9)}
+\author{Davi Khvedelidze}
+\institute{Tutors: Naresh Modina, Stefano Secci}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+\note{
+Introduce yourself, course, tutors, and the project in one sentence.
+State the core problem: cold-start and memory cost in edge/serverless.
+State contribution: reproducible benchmark across runtimes on macOS.
+}
+
+\begin{frame}{Project Subject}
+  \begin{itemize}
+    \item Edge and serverless systems are sensitive to cold-start latency and memory overhead.
+    \item Containers are flexible but heavy for short-lived services.
+    \item WebAssembly runtimes promise fast startup with smaller footprints.
+  \end{itemize}
+\end{frame}
+\note{
+Motivate why startup matters for bursty workloads.
+Explain why containers can be overkill for tiny services.
+Position WASM as the lightweight alternative you are testing.
+}
+
+\begin{frame}{Technological Context I}
+  \begin{itemize}
+    \item Containers: Docker provides packaging and isolation but adds startup cost.
+    \item WebAssembly: portable bytecode with near-native execution.
+    \item wasmCloud: component model with capability providers and a host runtime.
+    \item MicroVMs and unikernels are relevant but out of scope on macOS.
+  \end{itemize}
+\end{frame}
+\note{
+Define the baseline: Docker containers.
+Explain WASM as a portable runtime target.
+Introduce wasmCloud's host + provider model.
+Mention that microVMs are excluded due to macOS constraints.
+}
+
+\begin{frame}{Technological Context II}
+  \begin{itemize}
+    \item Wasmtime and WasmEdge run WASI modules directly with low overhead.
+    \item wasmCloud adds a control plane (host + NATS + providers) for composition.
+    \item Trade-off: raw startup and memory efficiency vs modularity and features.
+  \end{itemize}
+\end{frame}
+\note{
+Contrast direct runtimes (Wasmtime/WasmEdge) with wasmCloud's extra layers.
+Make the trade-off explicit: speed and density vs operational features.
+}
+
+\begin{frame}{Base Specifications and Scope}
+  \begin{itemize}
+    \item Workloads: hello-wasm, CPU hash, HTTP service with \texttt{/} and \texttt{/state}.
+    \item Metrics: cold-start, warm latency, throughput, RSS, CPU utilization.
+    \item Runtimes: native, Docker, wasmCloud, Wasmtime, WasmEdge on macOS M3 Pro.
+    \item Firewall: macOS \texttt{pf} on/off to reflect real host policies.
+  \end{itemize}
+\end{frame}
+\note{
+List the workloads and why each one exists.
+State the metrics you capture for fairness.
+Clarify the hardware and OS: MacBook Pro M3 Pro.
+Explain why firewall is included for realism.
+}
+
+\begin{frame}{Methodology and Automation}
+  \begin{itemize}
+    \item Cold start: launch to first HTTP 200 response.
+    \item Warm runs: cached runtime and preloaded modules.
+    \item HTTP runs: 5 warmups, 50 sequential latencies, 200 requests at concurrency 10.
+    \item Full automation: scripts, raw logs, and plot generation per run.
+  \end{itemize}
+\end{frame}
+\note{
+Define cold vs warm in one sentence each.
+Explain the request pattern and why it separates latency vs throughput.
+Stress reproducibility: scripts, raw logs, and plots per run.
+}
+
+\begin{frame}{HTTP Results: Latency and Throughput}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \centering
+    \plotside{http_hello_latency_boxplot_by_runtime.png}
+    \vspace{0.2em}
+    \footnotesize Latency distribution (ms)
+
+    \column{0.5\textwidth}
+    \centering
+    \plotside{http_hello_throughput_mean_by_runtime.png}
+    \vspace{0.2em}
+    \footnotesize Throughput (req/s)
+  \end{columns}
+  \takeaway{Takeaway: warm latency is similar across runtimes; throughput differences are modest.}
+\end{frame}
+\note{
+Point to the median clustering in latency: network stack dominates.
+Explain why Wasmtime/native are slightly higher throughput.
+Mention Docker overhead and wasmCloud provider hop.
+}
+
+\begin{frame}{HTTP Memory Footprint}
+  \centering
+  \plotfull{http_hello_rss_mean_by_runtime.png}
+  \takeaway{wasmCloud is highest because the measurement includes host, NATS, wadm, and the HTTP provider.
+  Wasmtime is moderate, native is minimal.}
+\end{frame}
+\note{
+Explain what is counted in RSS for wasmCloud (multi-process).
+Connect memory to density and deployment constraints.
+}
+
+\begin{frame}{CPU-Bound Results}
+  \centering
+  \plotfull{cpu_hash_outer_ms_bar.png}
+  \takeaway{Wasmtime is close to native. Docker is slower on macOS. WasmEdge is much slower on this host,
+  indicating platform-specific runtime differences.}
+\end{frame}
+\note{
+This isolates raw compute cost.
+Wasmtime near-native suggests low WASI overhead.
+Docker slower due to virtualization layers on macOS.
+WasmEdge lag likely due to macOS optimization gaps.
+}
+
+\begin{frame}{Minimal WASI (hello-wasm)}
+  \centering
+  \plotfull{hello_wasm_elapsed_ms_bar.png}
+  \takeaway{This isolates invocation overhead. Wasmtime has lower fixed cost than WasmEdge on macOS,
+  which matters for tiny serverless functions.}
+\end{frame}
+\note{
+This is a pure startup/invocation overhead test.
+Emphasize the importance for microfunctions.
+}
+
+\begin{frame}{Cold-Start Comparison}
+  \centering
+  \plotfull{cold_warm_comparison_bar.png}
+  \takeaway{Full cold is dominated by build time. Runtime cold shows Wasmtime starting faster than Docker.}
+\end{frame}
+\note{
+Full cold includes build time, so it is much higher.
+Runtime cold isolates true startup costs.
+Takeaway: avoiding rebuilds is critical.
+}
+
+\begin{frame}{Developments Achieved and Challenges}
+  \begin{itemize}
+    \item Automated pipeline: build, run, log, and plot in one script.
+    \item Firewall integration to measure realistic host constraints.
+    \item wasmCloud readiness issues fixed with \texttt{wash up}, loopback binding, and cleanup.
+    \item Reproducible datasets and timestamped plots for each campaign.
+  \end{itemize}
+\end{frame}
+\note{
+Highlight engineering work beyond experiments.
+Mention the wasmCloud readiness fix as a key challenge solved.
+}
+
+\begin{frame}{Summary and Next Steps}
+  \begin{itemize}
+    \item Wasmtime delivers the fastest runtime cold starts with near-native CPU results.
+    \item wasmCloud trades higher startup and memory cost for modularity and capabilities.
+    \item Docker remains a stable baseline but has higher startup and CPU overhead.
+    \item Next: Firecracker on Linux, richer workloads, and firewall-conditioned analysis.
+  \end{itemize}
+\end{frame}
+\note{
+Summarize the key trade-offs in one minute.
+End with what you would do next for the final report.
+}
+
+\end{document}

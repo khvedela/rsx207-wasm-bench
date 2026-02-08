@@ -6,7 +6,6 @@ Thumbs.db
 *~
 .vscode/
 .idea/
-*.log
 
 # --- Rust / Cargo ---
 # Top-level target (if you ever create one)
@@ -15,12 +14,12 @@ target/
 # Per-crate targets (workloads, wasm components, etc.)
 workloads/**/target/
 workloads/**/build/
+workloads/**/CACHEDIR.TAG
+workloads/**/CACHEDIR*.TAG
 
 # Cargo metadata
 **/.cargo/
 **/Cargo.lock
-
-# If you prefer to keep Cargo.lock for binaries, comment the line above.
 
 # --- Python ---
 __pycache__/
@@ -32,6 +31,8 @@ __pycache__/
 .venv/
 venv/
 env/
+.pytest_cache/
+.ipynb_checkpoints/
 
 # --- Node / frontend (if you add any UI later) ---
 node_modules/
@@ -42,9 +43,30 @@ build/
 # Raw measurement logs: big, reproducible by rerunning scripts
 results/raw/
 
-# Processed results/images: keep these if you want them in the repo.
-# Uncomment the next line if you also want to ignore plots and summaries.
-# results/processed/
+# Keep generated plots and summaries for documentation
+# But exclude timestamped result folders (can regenerate)
+results/processed/*/
+
+# Keep only the main processed outputs (plots, summaries, tables)
+!results/processed/*.png
+!results/processed/*.pdf
+!results/processed/*.md
+!results/processed/*.tex
+!results/processed/*.txt
+!results/processed/*.csv
+
+# --- LaTeX temporary files ---
+docs/*.aux
+docs/*.log
+docs/*.toc
+docs/*.out
+docs/*.nav
+docs/*.snm
+docs/*.bbl
+docs/*.blg
+docs/*.synctex.gz
+docs/*.fdb_latexmk
+docs/*.fls
 
 # --- Docker / container stuff ---
 *.tar
@@ -59,3 +81,6 @@ wash.lock
 # --- Misc ---
 *.tmp
 *.bak
+
+# --- Tutorial / scratch files ---
+TUTOR_QUESTIONS.md

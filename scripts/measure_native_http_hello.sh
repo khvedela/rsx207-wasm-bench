@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Root of the repository (one level up from scripts/)
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib/common.sh"
 
 BIN="$ROOT_DIR/workloads/http-hello/target/release/http-hello"
 RESULTS_DIR="$ROOT_DIR/results/raw/native/http-hello"
@@ -17,22 +18,22 @@ if [[ ! -x "$BIN" ]]; then
 fi
 
 # Check gdate is available (coreutils)
-if ! command -v gdate >/dev/null 2>&1; then
-  echo "ERROR: gdate not found. Install coreutils with:" >&2
-  echo "  brew install coreutils" >&2
-  exit 1
-fi
+check_gdate || exit 1
 
 RUN_TS="$(date -u +"%Y-%m-%dT%H-%M-%SZ")"
 LOG_FILE="$RESULTS_DIR/${RUN_TS}_run.log"
 
 PORT=8080
-URL="http://127.0.0.1:${PORT}/"
+PATH_SUFFIX="${PATH_SUFFIX:-/}"
+if [[ "$PATH_SUFFIX" != /* ]]; then
+  PATH_SUFFIX="/${PATH_SUFFIX}"
+fi
+URL="http://127.0.0.1:${PORT}${PATH_SUFFIX}"
 
 echo "==== native http-hello run at ${RUN_TS} ====" | tee "$LOG_FILE"
 echo "binary: $BIN" | tee -a "$LOG_FILE"
 echo "url: $URL" | tee -a "$LOG_FILE"
-echo "host_os: $(uname -a)" | tee -a "$LOG_FILE"
+log_versions "$LOG_FILE"
 
 # Start server in background
 echo "[measure] starting server..." | tee -a "$LOG_FILE"
@@ -47,40 +48,18 @@ cleanup() {
     kill "$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
   fi
+}cleanup_process "$SERVER_PID"
 }
 trap cleanup EXIT
 
 # Wait for readiness: first HTTP 200
-echo "[measure] waiting for HTTP 200 from server..." | tee -a "$LOG_FILE"
-retries=0
-max_retries=200  # ~2 seconds total if sleep 0.01
-ready=0
+wait_for_http_ready "$URL" "$LOG_FILE" "$t0_ns" || exit 1
 
-while (( retries < max_retries )); do
-  http_code=$(curl -sS -o /dev/null -w "%{http_code}" "$URL" || echo "000")
-  if [[ "$http_code" == "200" ]]; then
-    t_ready_ns=$(gdate +%s%N)
-    ready=1
-    break
-  fi
-  retries=$((retries + 1))
-  sleep 0.01
-done
+# Warm-up requests (not measured)
+WARMUP_REQ="${WARMUP_REQ:-5}"
+run_warmup_requests "$URL" "$WARMUP_REQ" "$LOG_FILE"
 
-if (( ready == 0 )); then
-  echo "[measure] ERROR: server did not become ready in time" | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-cold_start_ns=$((t_ready_ns - t0_ns))
-cold_start_ms=$(awk "BEGIN { printf \"%.3f\", $cold_start_ns/1000000 }")
-
-echo "[measure] cold_start_ns=${cold_start_ns}" | tee -a "$LOG_FILE"
-echo "[measure] cold_start_ms=${cold_start_ms}" | tee -a "$LOG_FILE"
-
-# Latency test: N sequential requests
-N_REQ=50
-echo "[measure] running ${N_REQ} sequential requests..." | tee -a "$LOG_FILE"
+record_resources "$SERVER_PID" "$LOG_FILEEQ} sequential requests..." | tee -a "$LOG_FILE"
 
 for i in $(seq 1 "$N_REQ"); do
   req_start_ns=$(gdate +%s%N)
@@ -95,4 +74,25 @@ for i in $(seq 1 "$N_REQ"); do
     | tee -a "$LOG_FILE"
 done
 
+THROUGHPUT_REQS="${THROUGHPUT_REQS:-200}"
+THROUGHPUT_CONC="${THROUGHPUT_CONC:-10}"
+if (( THROUGHPUT_REQS > 0 )); then
+  echo "[measure] throughput_reqs=${THROUGHPUT_REQS} throughput_conc=${THROUGHPUT_CONC}" | tee -a "$LOG_FILE"
+  t_tp_start_ns=$(gdate +%s%N)
+  seq 1 "$THROUGHPUT_REQS" | xargs -P "$THROUGHPUT_CONC" -I {} \
+    curl -sS -o /dev/null "$URL" >/dev/null 2>&1 || true
+  t_tp_end_ns=$(gdate +%s%N)
+  tp_ns=$((t_tp_end_ns - t_tp_start_ns))
+  tp_s=$(awk -v ns="$tp_ns" 'BEGIN { printf "%.6f", ns/1000000000 }')
+  tp_rps=$(awk -v n="$THROUGHPUT_REQS" -v ns="$tp_ns" 'BEGIN { if (ns>0) printf "%.3f", n/(ns/1000000000); else print "0" }')
+  echo "[measure] throughput_total_s=${tp_s} throughput_rps=${tp_rps}" | tee -a "$LOG_FILE"
+fi
+
 echo "[measure] finished run, logs in: $LOG_FILE"
+measure_latency_sequential "$URL" "$N_REQ" "$LOG_FILE"
+
+# Throughput test
+THROUGHPUT_REQS="${THROUGHPUT_REQS:-200}"
+THROUGHPUT_CONC="${THROUGHPUT_CONC:-10}"
+if (( THROUGHPUT_REQS > 0 )); then
+  measure_throughput_concurrent "$URL" "$THROUGHPUT_REQS" "$THROUGHPUT_CONC"

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$ROOT_DIR/scripts/lib/common.sh"
 
 IMAGE_NAME="http-hello-native"
 RESULTS_DIR="$ROOT_DIR/results/raw/docker/http-hello"
@@ -9,28 +10,52 @@ RESULTS_DIR="$ROOT_DIR/results/raw/docker/http-hello"
 mkdir -p "$RESULTS_DIR"
 
 # Check gdate
-if ! command -v gdate >/dev/null 2>&1; then
-  echo "ERROR: gdate not found. Install coreutils with:" >&2
-  echo "  brew install coreutils" >&2
-  exit 1
-fi
+check_gdate || exit 1
 
-# Ensure image exists (build if needed)
-if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
-  echo "[measure] Docker image '$IMAGE_NAME' not found, building..."
-  (cd "$ROOT_DIR/workloads/http-hello" && docker build -t "$IMAGE_NAME" .)
-fi
-
+# Prepare run timestamp and log early so pre-build steps are recorded
 RUN_TS="$(date -u +"%Y-%m-%dT%H-%M-%SZ")"
 LOG_FILE="$RESULTS_DIR/${RUN_TS}_run.log"
 
+# Optional: perform a fuller "cold" run. Set env var `DOCKER_COLD=1` to
+# remove any existing image and build with `--no-cache --pull` so layer
+# caches are not reused. Set `DOCKER_PRUNE=1` to run `docker system prune -af`
+# before building (destructive; use with care).
+echo "DOCKER_COLD=${DOCKER_COLD:-0}" | tee -a "$LOG_FILE"
+echo "DOCKER_PRUNE=${DOCKER_PRUNE:-0}" | tee -a "$LOG_FILE"
+
+if [[ "${DOCKER_PRUNE:-0}" == "1" ]]; then
+  echo "[measure] DOCKER_PRUNE=1: running 'docker system prune -af' (destructive)" | tee -a "$LOG_FILE"
+  docker system prune -af || true
+fi
+
+# If DOCKER_COLD is set, remove any existing image so build is truly cold
+if [[ "${DOCKER_COLD:-0}" == "1" ]]; then
+  echo "[measure] DOCKER_COLD=1: removing existing image '$IMAGE_NAME' (if any)" | tee -a "$LOG_FILE"
+  docker image rm -f "$IMAGE_NAME" >/dev/null 2>&1 || true
+fi
+
+# Ensure image exists (build if needed). When DOCKER_COLD=1, build with no cache and pull latest base images.
+build_opts=()
+if [[ "${DOCKER_COLD:-0}" == "1" ]]; then
+  build_opts+=(--no-cache --pull)
+fi
+
+if ! docker image inspect "$IMAGE_NAME" >/dev/null 2>&1; then
+  echo "[measure] Docker image '$IMAGE_NAME' not found, building..." | tee -a "$LOG_FILE"
+  (cd "$ROOT_DIR/workloads/http-hello" && docker build "${build_opts[@]}" -t "$IMAGE_NAME" .)
+fi
+
 PORT=8080
-URL="http://127.0.0.1:${PORT}/"
+PATH_SUFFIX="${PATH_SUFFIX:-/}"
+if [[ "$PATH_SUFFIX" != /* ]]; then
+  PATH_SUFFIX="/${PATH_SUFFIX}"
+fi
+URL="http://127.0.0.1:${PORT}${PATH_SUFFIX}"
 
 echo "==== docker http-hello run at ${RUN_TS} ====" | tee "$LOG_FILE"
 echo "image: $IMAGE_NAME" | tee -a "$LOG_FILE"
 echo "url: $URL" | tee -a "$LOG_FILE"
-echo "host_os: $(uname -a)" | tee -a "$LOG_FILE"
+log_versions "$LOG_FILE"
 
 # Start container
 echo "[measure] starting container..." | tee -a "$LOG_FILE"
@@ -45,49 +70,52 @@ cleanup() {
 }
 trap cleanup EXIT
 
+to_bytes() {
+  local v=$1
+  local num unit factor
+  num=$(echo "$v" | sed -E 's/([0-9.]+).*/\1/')
+  unit=$(echo "$v" | sed -E 's/[0-9.]+([A-Za-z]+).*/\1/')
+  case "$unit" in
+    B) factor=1 ;;
+    KiB|KB) factor=1024 ;;
+    MiB|MB) factor=$((1024 * 1024)) ;;
+    GiB|GB) factor=$((1024 * 1024 * 1024)) ;;
+    TiB|TB) factor=$((1024 * 1024 * 1024 * 1024)) ;;
+    *) factor=1 ;;
+  esac
+  awk -v n="$num" -v f="$factor" 'BEGIN { printf "%d", n*f }'
+}
+
+record_docker_resources() {
+  local container_id=$1
+  local log_file=$2
+  local stats mem_used cpu_pct mem_bytes rss_kb
+  stats=$(docker stats --no-stream --format "{{.MemUsage}} {{.CPUPerc}}" "$container_id" 2>/dev/null || true)
+  mem_used=$(echo "$stats" | awk '{print $1}')
+  cpu_pct=$(echo "$stats" | awk '{print $2}')
+  cpu_pct=${cpu_pct%\%}
+  mem_bytes=$(to_bytes "${mem_used:-0B}")
+  rss_kb=$(awk -v b="$mem_bytes" 'BEGIN { printf "%d", b/1024 }')
+  echo "[measure] rss_kb=${rss_kb} cpu_pct=${cpu_pct:-0}" | tee -a "$log_file"
+}
+
 # Wait for readiness: first HTTP 200
-echo "[measure] waiting for HTTP 200 from container..." | tee -a "$LOG_FILE"
-retries=0
-max_retries=300  # ~3s
-ready=0
+wait_for_http_ready "$URL" "$LOG_FILE" "$t0_ns" 300 || exit 1
 
-while (( retries < max_retries )); do
-  http_code=$(curl -sS -o /dev/null -w "%{http_code}" "$URL" || echo "000")
-  if [[ "$http_code" == "200" ]]; then
-    t_ready_ns=$(gdate +%s%N)
-    ready=1
-    break
-  fi
-  retries=$((retries + 1))
-  sleep 0.01
-done
+# Warm-up requests (not measured)
+WARMUP_REQ="${WARMUP_REQ:-5}"
+run_warmup_requests "$URL" "$WARMUP_REQ" "$LOG_FILE"
 
-if (( ready == 0 )); then
-  echo "[measure] ERROR: container did not become ready in time" | tee -a "$LOG_FILE"
-  exit 1
-fi
-
-cold_start_ns=$((t_ready_ns - t0_ns))
-cold_start_ms=$(awk "BEGIN { printf \"%.3f\", $cold_start_ns/1000000 }")
-
-echo "[measure] cold_start_ns=${cold_start_ns}" | tee -a "$LOG_FILE"
-echo "[measure] cold_start_ms=${cold_start_ms}" | tee -a "$LOG_FILE"
+record_docker_resources "$CONTAINER_ID" "$LOG_FILE"
 
 # Latency test
 N_REQ=50
-echo "[measure] running ${N_REQ} sequential requests..." | tee -a "$LOG_FILE"
+measure_latency_sequential "$URL" "$N_REQ" "$LOG_FILE"
 
-for i in $(seq 1 "$N_REQ"); do
-  req_start_ns=$(gdate +%s%N)
-  body=$(curl -sS -w "%{http_code}" "$URL" 2>/dev/null)
-  req_end_ns=$(gdate +%s%N)
-
-  http_code="${body: -3}"
-  latency_ns=$((req_end_ns - req_start_ns))
-  latency_ms=$(awk "BEGIN { printf \"%.3f\", $latency_ns/1000000 }")
-
-  echo "req=${i} http_code=${http_code} latency_ns=${latency_ns} latency_ms=${latency_ms}" \
-    | tee -a "$LOG_FILE"
-done
+THROUGHPUT_REQS="${THROUGHPUT_REQS:-200}"
+THROUGHPUT_CONC="${THROUGHPUT_CONC:-10}"
+if (( THROUGHPUT_REQS > 0 )); then
+  measure_throughput_concurrent "$URL" "$THROUGHPUT_REQS" "$THROUGHPUT_CONC" "$LOG_FILE"
+fi
 
 echo "[measure] finished run, logs in: $LOG_FILE"

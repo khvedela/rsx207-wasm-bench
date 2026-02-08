@@ -1,0 +1,707 @@
+[2026-01-09T10:04:10Z] Starting full benchmark run[2026-01-09T10:04:10Z] Log file: /Users/david/Desktop/rsx207-wasm-bench/results/processed/2026-01-09T10-04-10Z_run_all.log[2026-01-09T10:04:10Z] Config: HTTP_RUNS=3 HTTP_SCENARIOS='cold warm' CPU_HASH_SCENARIOS='cold warm' HELLO_WASM_SCENARIOS='cold warm'[2026-01-09T10:04:10Z] Config: FIREWALL=both WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 MAX_RETRIES=6000[2026-01-09T10:04:10Z] Config: CLEAN_BUILD=0 DOCKER_PRUNE=0 CLEAR_WASH=1 CLEAR_CACHE_BETWEEN_RUNS=1 STRICT_CACHE_CLEAR=0 CONTINUE_ON_ERROR=0[2026-01-09T10:04:10Z] Priming sudo for firewall control[2026-01-09T10:04:12Z] Building workloads[2026-01-09T10:04:13Z] RUN (cd /Users/david/Desktop/rsx207-wasm-bench/workloads/http-hello): cargo build --release    Finished `release` profile [optimized] target(s) in 0.04s
+[2026-01-09T10:04:13Z] RUN (cd /Users/david/Desktop/rsx207-wasm-bench/workloads/cpu-hash): cargo build --release    Finished `release` profile [optimized] target(s) in 0.02s
+[2026-01-09T10:04:13Z] RUN (cd /Users/david/Desktop/rsx207-wasm-bench/workloads/hello-wasm): cargo build --release --target wasm32-wasip1    Finished `release` profile [optimized] target(s) in 0.00s
+[2026-01-09T10:04:13Z] RUN (cd /Users/david/Desktop/rsx207-wasm-bench/workloads/cpu-hash): cargo build --release --target wasm32-wasip1    Finished `release` profile [optimized] target(s) in 0.00s
+[2026-01-09T10:04:13Z] RUN (cd /Users/david/Desktop/rsx207-wasm-bench/workloads/wasmcloud-http-hello): wash build   Compiling ahash v0.8.11
+   Compiling serde_json v1.0.138
+   Compiling anyhow v1.0.95
+   Compiling memchr v2.7.4
+   Compiling leb128 v0.2.5
+   Compiling smallvec v1.14.0
+   Compiling log v0.4.25
+   Compiling indexmap v2.7.1
+   Compiling autocfg v1.4.0
+   Compiling heck v0.5.0
+   Compiling serde_derive v1.0.217
+   Compiling wit-bindgen-rust v0.32.0
+   Compiling prettyplease v0.2.29
+   Compiling wit-bindgen-rust-macro v0.32.0
+   Compiling wit-bindgen-rt v0.33.0
+   Compiling slab v0.4.9
+   Compiling wit-bindgen-rt v0.32.0
+   Compiling fnv v1.0.7
+   Compiling http v1.2.0
+   Compiling wasi v0.13.3+wasi-0.2.2
+   Compiling futures-util v0.3.31
+   Compiling hashbrown v0.14.5
+   Compiling wasmparser v0.217.1
+   Compiling futures v0.3.31
+   Compiling wit-parser v0.217.1
+   Compiling wasm-encoder v0.217.1
+   Compiling wasm-metadata v0.217.1
+   Compiling wit-component v0.217.1
+   Compiling wit-bindgen-core v0.32.0
+   Compiling wit-bindgen v0.32.0
+   Compiling wasmcloud-component v0.2.0
+   Compiling http-hello-world v0.1.0 (/Users/david/Desktop/rsx207-wasm-bench/workloads/wasmcloud-http-hello)
+    Finished `release` profile [optimized] target(s) in 7.44s
+
+Component built and signed and can be found at "/Users/david/Desktop/rsx207-wasm-bench/workloads/wasmcloud-http-hello/build/http_hello_world_s.wasm"
+[2026-01-09T10:04:24Z] HTTP suite: scenario=cold firewall=off path=/ docker_cold=1 wasmtime_cache=cold[2026-01-09T10:04:24Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_native_http_hello.sh==== native http-hello run at 2026-01-09T10-04-24Z ====
+binary: /Users/david/Desktop/rsx207-wasm-bench/workloads/http-hello/target/release/http-hello
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+rustc_version: rustc 1.91.1 (ed61e7d7e 2025-11-07)
+[measure] starting server...
+[measure] waiting for HTTP 200 from server...
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+[measure] cold_start_ns=277331000
+[measure] cold_start_ms=277.331
+[measure] warmup_requests=5
+[measure] rss_kb=1872 cpu_pct=0.00
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=10559000 latency_ms=10.559
+req=2 http_code=200 latency_ns=10415000 latency_ms=10.415
+req=3 http_code=200 latency_ns=10576000 latency_ms=10.576
+req=4 http_code=200 latency_ns=10366000 latency_ms=10.366
+req=5 http_code=200 latency_ns=11305000 latency_ms=11.305
+req=6 http_code=200 latency_ns=10533000 latency_ms=10.533
+req=7 http_code=200 latency_ns=10789000 latency_ms=10.789
+req=8 http_code=200 latency_ns=10214000 latency_ms=10.214
+req=9 http_code=200 latency_ns=10144000 latency_ms=10.144
+req=10 http_code=200 latency_ns=10131000 latency_ms=10.131
+req=11 http_code=200 latency_ns=11042000 latency_ms=11.042
+req=12 http_code=200 latency_ns=10308000 latency_ms=10.308
+req=13 http_code=200 latency_ns=10332000 latency_ms=10.332
+req=14 http_code=200 latency_ns=10384000 latency_ms=10.384
+req=15 http_code=200 latency_ns=10271000 latency_ms=10.271
+req=16 http_code=200 latency_ns=10210000 latency_ms=10.210
+req=17 http_code=200 latency_ns=10122000 latency_ms=10.122
+req=18 http_code=200 latency_ns=10653000 latency_ms=10.653
+req=19 http_code=200 latency_ns=10323000 latency_ms=10.323
+req=20 http_code=200 latency_ns=10564000 latency_ms=10.564
+req=21 http_code=200 latency_ns=10616000 latency_ms=10.616
+req=22 http_code=200 latency_ns=10218000 latency_ms=10.218
+req=23 http_code=200 latency_ns=10741000 latency_ms=10.741
+req=24 http_code=200 latency_ns=10821000 latency_ms=10.821
+req=25 http_code=200 latency_ns=10734000 latency_ms=10.734
+req=26 http_code=200 latency_ns=12800000 latency_ms=12.800
+req=27 http_code=200 latency_ns=10732000 latency_ms=10.732
+req=28 http_code=200 latency_ns=10771000 latency_ms=10.771
+req=29 http_code=200 latency_ns=10471000 latency_ms=10.471
+req=30 http_code=200 latency_ns=10153000 latency_ms=10.153
+req=31 http_code=200 latency_ns=10327000 latency_ms=10.327
+req=32 http_code=200 latency_ns=10767000 latency_ms=10.767
+req=33 http_code=200 latency_ns=10342000 latency_ms=10.342
+req=34 http_code=200 latency_ns=10505000 latency_ms=10.505
+req=35 http_code=200 latency_ns=10414000 latency_ms=10.414
+req=36 http_code=200 latency_ns=10450000 latency_ms=10.450
+req=37 http_code=200 latency_ns=12780000 latency_ms=12.780
+req=38 http_code=200 latency_ns=9984000 latency_ms=9.984
+req=39 http_code=200 latency_ns=10737000 latency_ms=10.737
+req=40 http_code=200 latency_ns=10528000 latency_ms=10.528
+req=41 http_code=200 latency_ns=10573000 latency_ms=10.573
+req=42 http_code=200 latency_ns=10287000 latency_ms=10.287
+req=43 http_code=200 latency_ns=10334000 latency_ms=10.334
+req=44 http_code=200 latency_ns=12457000 latency_ms=12.457
+req=45 http_code=200 latency_ns=11961000 latency_ms=11.961
+req=46 http_code=200 latency_ns=12064000 latency_ms=12.064
+req=47 http_code=200 latency_ns=12622000 latency_ms=12.622
+req=48 http_code=200 latency_ns=11835000 latency_ms=11.835
+req=49 http_code=200 latency_ns=11726000 latency_ms=11.726
+req=50 http_code=200 latency_ns=11148000 latency_ms=11.148
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.231302 throughput_rps=864.670
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/native/http-hello/2026-01-09T10-04-24Z_run.log
+[2026-01-09T10:04:25Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_native_http_hello.sh==== native http-hello run at 2026-01-09T10-04-25Z ====
+binary: /Users/david/Desktop/rsx207-wasm-bench/workloads/http-hello/target/release/http-hello
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+rustc_version: rustc 1.91.1 (ed61e7d7e 2025-11-07)
+[measure] starting server...
+[measure] waiting for HTTP 200 from server...
+[measure] cold_start_ns=12540000
+[measure] cold_start_ms=12.540
+[measure] warmup_requests=5
+[measure] rss_kb=1856 cpu_pct=0.40
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=12288000 latency_ms=12.288
+req=2 http_code=200 latency_ns=10760000 latency_ms=10.760
+req=3 http_code=200 latency_ns=10420000 latency_ms=10.420
+req=4 http_code=200 latency_ns=10832000 latency_ms=10.832
+req=5 http_code=200 latency_ns=10666000 latency_ms=10.666
+req=6 http_code=200 latency_ns=10357000 latency_ms=10.357
+req=7 http_code=200 latency_ns=10615000 latency_ms=10.615
+req=8 http_code=200 latency_ns=10147000 latency_ms=10.147
+req=9 http_code=200 latency_ns=11088000 latency_ms=11.088
+req=10 http_code=200 latency_ns=10383000 latency_ms=10.383
+req=11 http_code=200 latency_ns=10550000 latency_ms=10.550
+req=12 http_code=200 latency_ns=10439000 latency_ms=10.439
+req=13 http_code=200 latency_ns=10698000 latency_ms=10.698
+req=14 http_code=200 latency_ns=10656000 latency_ms=10.656
+req=15 http_code=200 latency_ns=10411000 latency_ms=10.411
+req=16 http_code=200 latency_ns=10463000 latency_ms=10.463
+req=17 http_code=200 latency_ns=10607000 latency_ms=10.607
+req=18 http_code=200 latency_ns=10389000 latency_ms=10.389
+req=19 http_code=200 latency_ns=11103000 latency_ms=11.103
+req=20 http_code=200 latency_ns=10623000 latency_ms=10.623
+req=21 http_code=200 latency_ns=9758000 latency_ms=9.758
+req=22 http_code=200 latency_ns=10245000 latency_ms=10.245
+req=23 http_code=200 latency_ns=10219000 latency_ms=10.219
+req=24 http_code=200 latency_ns=10325000 latency_ms=10.325
+req=25 http_code=200 latency_ns=10497000 latency_ms=10.497
+req=26 http_code=200 latency_ns=10429000 latency_ms=10.429
+req=27 http_code=200 latency_ns=10950000 latency_ms=10.950
+req=28 http_code=200 latency_ns=10507000 latency_ms=10.507
+req=29 http_code=200 latency_ns=10386000 latency_ms=10.386
+req=30 http_code=200 latency_ns=10927000 latency_ms=10.927
+req=31 http_code=200 latency_ns=10293000 latency_ms=10.293
+req=32 http_code=200 latency_ns=9881000 latency_ms=9.881
+req=33 http_code=200 latency_ns=10475000 latency_ms=10.475
+req=34 http_code=200 latency_ns=10488000 latency_ms=10.488
+req=35 http_code=200 latency_ns=10325000 latency_ms=10.325
+req=36 http_code=200 latency_ns=10392000 latency_ms=10.392
+req=37 http_code=200 latency_ns=10304000 latency_ms=10.304
+req=38 http_code=200 latency_ns=10152000 latency_ms=10.152
+req=39 http_code=200 latency_ns=10317000 latency_ms=10.317
+req=40 http_code=200 latency_ns=10369000 latency_ms=10.369
+req=41 http_code=200 latency_ns=10190000 latency_ms=10.190
+req=42 http_code=200 latency_ns=11648000 latency_ms=11.648
+req=43 http_code=200 latency_ns=10259000 latency_ms=10.259
+req=44 http_code=200 latency_ns=10479000 latency_ms=10.479
+req=45 http_code=200 latency_ns=10595000 latency_ms=10.595
+req=46 http_code=200 latency_ns=10409000 latency_ms=10.409
+req=47 http_code=200 latency_ns=10253000 latency_ms=10.253
+req=48 http_code=200 latency_ns=10329000 latency_ms=10.329
+req=49 http_code=200 latency_ns=10018000 latency_ms=10.018
+req=50 http_code=200 latency_ns=10159000 latency_ms=10.159
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.236149 throughput_rps=846.923
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/native/http-hello/2026-01-09T10-04-25Z_run.log
+[2026-01-09T10:04:27Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_native_http_hello.sh==== native http-hello run at 2026-01-09T10-04-27Z ====
+binary: /Users/david/Desktop/rsx207-wasm-bench/workloads/http-hello/target/release/http-hello
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+rustc_version: rustc 1.91.1 (ed61e7d7e 2025-11-07)
+[measure] starting server...
+[measure] waiting for HTTP 200 from server...
+[measure] cold_start_ns=12702000
+[measure] cold_start_ms=12.702
+[measure] warmup_requests=5
+[measure] rss_kb=1872 cpu_pct=0.00
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=16794000 latency_ms=16.794
+req=2 http_code=200 latency_ns=10757000 latency_ms=10.757
+req=3 http_code=200 latency_ns=10289000 latency_ms=10.289
+req=4 http_code=200 latency_ns=10378000 latency_ms=10.378
+req=5 http_code=200 latency_ns=10342000 latency_ms=10.342
+req=6 http_code=200 latency_ns=10247000 latency_ms=10.247
+req=7 http_code=200 latency_ns=9957000 latency_ms=9.957
+req=8 http_code=200 latency_ns=10435000 latency_ms=10.435
+req=9 http_code=200 latency_ns=10742000 latency_ms=10.742
+req=10 http_code=200 latency_ns=10642000 latency_ms=10.642
+req=11 http_code=200 latency_ns=9491000 latency_ms=9.491
+req=12 http_code=200 latency_ns=9767000 latency_ms=9.767
+req=13 http_code=200 latency_ns=10191000 latency_ms=10.191
+req=14 http_code=200 latency_ns=10059000 latency_ms=10.059
+req=15 http_code=200 latency_ns=9646000 latency_ms=9.646
+req=16 http_code=200 latency_ns=10398000 latency_ms=10.398
+req=17 http_code=200 latency_ns=10421000 latency_ms=10.421
+req=18 http_code=200 latency_ns=10322000 latency_ms=10.322
+req=19 http_code=200 latency_ns=9746000 latency_ms=9.746
+req=20 http_code=200 latency_ns=10540000 latency_ms=10.540
+req=21 http_code=200 latency_ns=10384000 latency_ms=10.384
+req=22 http_code=200 latency_ns=10389000 latency_ms=10.389
+req=23 http_code=200 latency_ns=10697000 latency_ms=10.697
+req=24 http_code=200 latency_ns=10341000 latency_ms=10.341
+req=25 http_code=200 latency_ns=10669000 latency_ms=10.669
+req=26 http_code=200 latency_ns=10756000 latency_ms=10.756
+req=27 http_code=200 latency_ns=10691000 latency_ms=10.691
+req=28 http_code=200 latency_ns=10408000 latency_ms=10.408
+req=29 http_code=200 latency_ns=10157000 latency_ms=10.157
+req=30 http_code=200 latency_ns=10233000 latency_ms=10.233
+req=31 http_code=200 latency_ns=10095000 latency_ms=10.095
+req=32 http_code=200 latency_ns=10372000 latency_ms=10.372
+req=33 http_code=200 latency_ns=10291000 latency_ms=10.291
+req=34 http_code=200 latency_ns=10569000 latency_ms=10.569
+req=35 http_code=200 latency_ns=10395000 latency_ms=10.395
+req=36 http_code=200 latency_ns=9526000 latency_ms=9.526
+req=37 http_code=200 latency_ns=10556000 latency_ms=10.556
+req=38 http_code=200 latency_ns=10188000 latency_ms=10.188
+req=39 http_code=200 latency_ns=10082000 latency_ms=10.082
+req=40 http_code=200 latency_ns=9905000 latency_ms=9.905
+req=41 http_code=200 latency_ns=10368000 latency_ms=10.368
+req=42 http_code=200 latency_ns=11084000 latency_ms=11.084
+req=43 http_code=200 latency_ns=10471000 latency_ms=10.471
+req=44 http_code=200 latency_ns=10077000 latency_ms=10.077
+req=45 http_code=200 latency_ns=10057000 latency_ms=10.057
+req=46 http_code=200 latency_ns=10573000 latency_ms=10.573
+req=47 http_code=200 latency_ns=10096000 latency_ms=10.096
+req=48 http_code=200 latency_ns=10503000 latency_ms=10.503
+req=49 http_code=200 latency_ns=10285000 latency_ms=10.285
+req=50 http_code=200 latency_ns=10268000 latency_ms=10.268
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.229459 throughput_rps=871.615
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/native/http-hello/2026-01-09T10-04-27Z_run.log
+[2026-01-09T10:04:28Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 DOCKER_COLD=1 DOCKER_PRUNE=0 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_docker_http_hello.shDOCKER_COLD=1
+DOCKER_PRUNE=0
+[measure] DOCKER_COLD=1: removing existing image 'http-hello-native' (if any)
+[measure] Docker image 'http-hello-native' not found, building...
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 428B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 1.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 DONE 1.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/5] FROM docker.io/library/rust:1.84@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
+#5 DONE 0.0s
+
+#6 [builder 2/5] WORKDIR /src
+#6 CACHED
+
+#7 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:d5d3f9c23164ea16f31852f95bd5959aad1c5e854332fe00f7b3a20fcc9f635c
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 263B done
+#8 DONE 0.0s
+
+#9 [builder 3/5] COPY Cargo.toml Cargo.lock ./
+#9 DONE 0.0s
+
+#10 [builder 4/5] COPY src ./src
+#10 DONE 0.0s
+
+#11 [stage-1 2/4] RUN useradd -m app
+#11 DONE 0.1s
+
+#12 [builder 5/5] RUN cargo build --release
+#12 ...
+
+#13 [stage-1 3/4] WORKDIR /app
+#13 DONE 0.0s
+
+#12 [builder 5/5] RUN cargo build --release
+#12 0.288     Updating crates.io index
+#12 0.905  Downloading crates ...
+#12 1.051   Downloaded chunked_transfer v1.5.0
+#12 1.060   Downloaded httpdate v1.0.3
+#12 1.121   Downloaded ascii v1.1.0
+#12 1.126   Downloaded tiny_http v0.12.0
+#12 1.130   Downloaded log v0.4.29
+#12 1.154    Compiling ascii v1.1.0
+#12 1.154    Compiling chunked_transfer v1.5.0
+#12 1.154    Compiling httpdate v1.0.3
+#12 1.155    Compiling log v0.4.29
+#12 1.427    Compiling tiny_http v0.12.0
+#12 2.343    Compiling http-hello v0.1.0 (/src)
+#12 2.640     Finished `release` profile [optimized] target(s) in 2.50s
+#12 DONE 2.6s
+
+#14 [stage-1 4/4] COPY --from=builder /src/target/release/http-hello /app/http-hello
+#14 DONE 0.0s
+
+#15 exporting to image
+#15 exporting layers 0.0s done
+#15 writing image sha256:183989fd7d363f6b6d2073d7f930a967fac2d83ca1b124209be00837eecbb84a done
+#15 naming to docker.io/library/http-hello-native done
+#15 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/xygt6gcta214gs7nezgpcdlbb
+
+What's Next?
+  1. Sign in to your Docker account → docker login
+  2. View a summary of image vulnerabilities and recommendations → docker scout quickview
+==== docker http-hello run at 2026-01-09T10-04-28Z ====
+image: http-hello-native
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+docker_version: Docker version 25.0.3, build 4debf41
+[measure] starting container...
+[measure] waiting for HTTP 200 from container...
+[measure] cold_start_ns=183935000
+[measure] cold_start_ms=183.935
+[measure] warmup_requests=5
+[measure] rss_kb=1016 cpu_pct=/
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=27694000 latency_ms=27.694
+req=2 http_code=200 latency_ns=14104000 latency_ms=14.104
+req=3 http_code=200 latency_ns=13005000 latency_ms=13.005
+req=4 http_code=200 latency_ns=12924000 latency_ms=12.924
+req=5 http_code=200 latency_ns=12467000 latency_ms=12.467
+req=6 http_code=200 latency_ns=12641000 latency_ms=12.641
+req=7 http_code=200 latency_ns=12707000 latency_ms=12.707
+req=8 http_code=200 latency_ns=12200000 latency_ms=12.200
+req=9 http_code=200 latency_ns=12650000 latency_ms=12.650
+req=10 http_code=200 latency_ns=12560000 latency_ms=12.560
+req=11 http_code=200 latency_ns=12671000 latency_ms=12.671
+req=12 http_code=200 latency_ns=12403000 latency_ms=12.403
+req=13 http_code=200 latency_ns=12540000 latency_ms=12.540
+req=14 http_code=200 latency_ns=12619000 latency_ms=12.619
+req=15 http_code=200 latency_ns=12622000 latency_ms=12.622
+req=16 http_code=200 latency_ns=12593000 latency_ms=12.593
+req=17 http_code=200 latency_ns=12711000 latency_ms=12.711
+req=18 http_code=200 latency_ns=12768000 latency_ms=12.768
+req=19 http_code=200 latency_ns=11311000 latency_ms=11.311
+req=20 http_code=200 latency_ns=11548000 latency_ms=11.548
+req=21 http_code=200 latency_ns=11857000 latency_ms=11.857
+req=22 http_code=200 latency_ns=12152000 latency_ms=12.152
+req=23 http_code=200 latency_ns=11198000 latency_ms=11.198
+req=24 http_code=200 latency_ns=12079000 latency_ms=12.079
+req=25 http_code=200 latency_ns=10977000 latency_ms=10.977
+req=26 http_code=200 latency_ns=10795000 latency_ms=10.795
+req=27 http_code=200 latency_ns=11042000 latency_ms=11.042
+req=28 http_code=200 latency_ns=11316000 latency_ms=11.316
+req=29 http_code=200 latency_ns=11492000 latency_ms=11.492
+req=30 http_code=200 latency_ns=10633000 latency_ms=10.633
+req=31 http_code=200 latency_ns=10916000 latency_ms=10.916
+req=32 http_code=200 latency_ns=10513000 latency_ms=10.513
+req=33 http_code=200 latency_ns=10607000 latency_ms=10.607
+req=34 http_code=200 latency_ns=10862000 latency_ms=10.862
+req=35 http_code=200 latency_ns=12427000 latency_ms=12.427
+req=36 http_code=200 latency_ns=12873000 latency_ms=12.873
+req=37 http_code=200 latency_ns=12293000 latency_ms=12.293
+req=38 http_code=200 latency_ns=12245000 latency_ms=12.245
+req=39 http_code=200 latency_ns=12203000 latency_ms=12.203
+req=40 http_code=200 latency_ns=12428000 latency_ms=12.428
+req=41 http_code=200 latency_ns=12063000 latency_ms=12.063
+req=42 http_code=200 latency_ns=12501000 latency_ms=12.501
+req=43 http_code=200 latency_ns=12488000 latency_ms=12.488
+req=44 http_code=200 latency_ns=12970000 latency_ms=12.970
+req=45 http_code=200 latency_ns=12163000 latency_ms=12.163
+req=46 http_code=200 latency_ns=12393000 latency_ms=12.393
+req=47 http_code=200 latency_ns=12768000 latency_ms=12.768
+req=48 http_code=200 latency_ns=12292000 latency_ms=12.292
+req=49 http_code=200 latency_ns=11242000 latency_ms=11.242
+req=50 http_code=200 latency_ns=10945000 latency_ms=10.945
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.252971 throughput_rps=790.604
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/docker/http-hello/2026-01-09T10-04-28Z_run.log
+[2026-01-09T10:04:48Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 DOCKER_COLD=1 DOCKER_PRUNE=0 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_docker_http_hello.shDOCKER_COLD=1
+DOCKER_PRUNE=0
+[measure] DOCKER_COLD=1: removing existing image 'http-hello-native' (if any)
+[measure] Docker image 'http-hello-native' not found, building...
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 428B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/5] FROM docker.io/library/rust:1.84@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
+#5 DONE 0.0s
+
+#6 [builder 2/5] WORKDIR /src
+#6 CACHED
+
+#7 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:d5d3f9c23164ea16f31852f95bd5959aad1c5e854332fe00f7b3a20fcc9f635c
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 263B done
+#8 DONE 0.0s
+
+#9 [builder 3/5] COPY Cargo.toml Cargo.lock ./
+#9 DONE 0.0s
+
+#10 [builder 4/5] COPY src ./src
+#10 DONE 0.0s
+
+#11 [stage-1 2/4] RUN useradd -m app
+#11 DONE 0.1s
+
+#12 [builder 5/5] RUN cargo build --release
+#12 ...
+
+#13 [stage-1 3/4] WORKDIR /app
+#13 DONE 0.0s
+
+#12 [builder 5/5] RUN cargo build --release
+#12 0.149     Updating crates.io index
+#12 0.262  Downloading crates ...
+#12 0.341   Downloaded log v0.4.29
+#12 0.344   Downloaded httpdate v1.0.3
+#12 0.345   Downloaded ascii v1.1.0
+#12 0.354   Downloaded chunked_transfer v1.5.0
+#12 0.356   Downloaded tiny_http v0.12.0
+#12 0.376    Compiling chunked_transfer v1.5.0
+#12 0.376    Compiling httpdate v1.0.3
+#12 0.376    Compiling log v0.4.29
+#12 0.376    Compiling ascii v1.1.0
+#12 0.498    Compiling tiny_http v0.12.0
+#12 1.907    Compiling http-hello v0.1.0 (/src)
+#12 2.184     Finished `release` profile [optimized] target(s) in 2.05s
+#12 DONE 2.2s
+
+#14 [stage-1 4/4] COPY --from=builder /src/target/release/http-hello /app/http-hello
+#14 DONE 0.0s
+
+#15 exporting to image
+#15 exporting layers done
+#15 writing image sha256:401f2733b5982539f8bcfb4d175185676bead54ab65cedbd21a5e4a0ee65702c done
+#15 naming to docker.io/library/http-hello-native done
+#15 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/t8gnp3j71ggpv5d7sdvda2brk
+
+What's Next?
+  1. Sign in to your Docker account → docker login
+  2. View a summary of image vulnerabilities and recommendations → docker scout quickview
+==== docker http-hello run at 2026-01-09T10-04-48Z ====
+image: http-hello-native
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+docker_version: Docker version 25.0.3, build 4debf41
+[measure] starting container...
+[measure] waiting for HTTP 200 from container...
+[measure] cold_start_ns=158214000
+[measure] cold_start_ms=158.214
+[measure] warmup_requests=5
+[measure] rss_kb=896 cpu_pct=/
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=19038000 latency_ms=19.038
+req=2 http_code=200 latency_ns=17027000 latency_ms=17.027
+req=3 http_code=200 latency_ns=12721000 latency_ms=12.721
+req=4 http_code=200 latency_ns=12718000 latency_ms=12.718
+req=5 http_code=200 latency_ns=13175000 latency_ms=13.175
+req=6 http_code=200 latency_ns=14732000 latency_ms=14.732
+req=7 http_code=200 latency_ns=14996000 latency_ms=14.996
+req=8 http_code=200 latency_ns=22700000 latency_ms=22.700
+req=9 http_code=200 latency_ns=16804000 latency_ms=16.804
+req=10 http_code=200 latency_ns=14117000 latency_ms=14.117
+req=11 http_code=200 latency_ns=14474000 latency_ms=14.474
+req=12 http_code=200 latency_ns=13864000 latency_ms=13.864
+req=13 http_code=200 latency_ns=13894000 latency_ms=13.894
+req=14 http_code=200 latency_ns=14293000 latency_ms=14.293
+req=15 http_code=200 latency_ns=13038000 latency_ms=13.038
+req=16 http_code=200 latency_ns=12221000 latency_ms=12.221
+req=17 http_code=200 latency_ns=11375000 latency_ms=11.375
+req=18 http_code=200 latency_ns=11541000 latency_ms=11.541
+req=19 http_code=200 latency_ns=11108000 latency_ms=11.108
+req=20 http_code=200 latency_ns=11819000 latency_ms=11.819
+req=21 http_code=200 latency_ns=14135000 latency_ms=14.135
+req=22 http_code=200 latency_ns=14826000 latency_ms=14.826
+req=23 http_code=200 latency_ns=13946000 latency_ms=13.946
+req=24 http_code=200 latency_ns=13745000 latency_ms=13.745
+req=25 http_code=200 latency_ns=13378000 latency_ms=13.378
+req=26 http_code=200 latency_ns=13786000 latency_ms=13.786
+req=27 http_code=200 latency_ns=15729000 latency_ms=15.729
+req=28 http_code=200 latency_ns=15920000 latency_ms=15.920
+req=29 http_code=200 latency_ns=13338000 latency_ms=13.338
+req=30 http_code=200 latency_ns=13367000 latency_ms=13.367
+req=31 http_code=200 latency_ns=13607000 latency_ms=13.607
+req=32 http_code=200 latency_ns=12570000 latency_ms=12.570
+req=33 http_code=200 latency_ns=12758000 latency_ms=12.758
+req=34 http_code=200 latency_ns=11717000 latency_ms=11.717
+req=35 http_code=200 latency_ns=11783000 latency_ms=11.783
+req=36 http_code=200 latency_ns=11301000 latency_ms=11.301
+req=37 http_code=200 latency_ns=10672000 latency_ms=10.672
+req=38 http_code=200 latency_ns=10888000 latency_ms=10.888
+req=39 http_code=200 latency_ns=11193000 latency_ms=11.193
+req=40 http_code=200 latency_ns=11102000 latency_ms=11.102
+req=41 http_code=200 latency_ns=11116000 latency_ms=11.116
+req=42 http_code=200 latency_ns=12500000 latency_ms=12.500
+req=43 http_code=200 latency_ns=11550000 latency_ms=11.550
+req=44 http_code=200 latency_ns=12633000 latency_ms=12.633
+req=45 http_code=200 latency_ns=12509000 latency_ms=12.509
+req=46 http_code=200 latency_ns=12530000 latency_ms=12.530
+req=47 http_code=200 latency_ns=12303000 latency_ms=12.303
+req=48 http_code=200 latency_ns=11989000 latency_ms=11.989
+req=49 http_code=200 latency_ns=11299000 latency_ms=11.299
+req=50 http_code=200 latency_ns=12484000 latency_ms=12.484
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.287880 throughput_rps=694.734
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/docker/http-hello/2026-01-09T10-04-48Z_run.log
+[2026-01-09T10:05:05Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 DOCKER_COLD=1 DOCKER_PRUNE=0 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_docker_http_hello.shDOCKER_COLD=1
+DOCKER_PRUNE=0
+[measure] DOCKER_COLD=1: removing existing image 'http-hello-native' (if any)
+[measure] Docker image 'http-hello-native' not found, building...
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 428B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 ...
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.3s
+
+#2 [internal] load metadata for docker.io/library/rust:1.84
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [builder 1/5] FROM docker.io/library/rust:1.84@sha256:738ae99a3d75623f41e6882566b4ef37e38a9840244a47efd4a0ca22e9628b88
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:d5d3f9c23164ea16f31852f95bd5959aad1c5e854332fe00f7b3a20fcc9f635c
+#6 CACHED
+
+#7 [builder 2/5] WORKDIR /src
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 263B done
+#8 DONE 0.0s
+
+#9 [builder 3/5] COPY Cargo.toml Cargo.lock ./
+#9 DONE 0.0s
+
+#10 [builder 4/5] COPY src ./src
+#10 DONE 0.1s
+
+#11 [builder 5/5] RUN cargo build --release
+#11 ...
+
+#12 [stage-1 2/4] RUN useradd -m app
+#12 DONE 0.2s
+
+#13 [stage-1 3/4] WORKDIR /app
+#13 DONE 0.0s
+
+#11 [builder 5/5] RUN cargo build --release
+#11 0.168     Updating crates.io index
+#11 0.343  Downloading crates ...
+#11 0.424   Downloaded chunked_transfer v1.5.0
+#11 0.431   Downloaded ascii v1.1.0
+#11 0.435   Downloaded log v0.4.29
+#11 0.439   Downloaded httpdate v1.0.3
+#11 0.440   Downloaded tiny_http v0.12.0
+#11 0.459    Compiling httpdate v1.0.3
+#11 0.459    Compiling ascii v1.1.0
+#11 0.459    Compiling chunked_transfer v1.5.0
+#11 0.460    Compiling log v0.4.29
+#11 0.654    Compiling tiny_http v0.12.0
+#11 1.592    Compiling http-hello v0.1.0 (/src)
+#11 1.846     Finished `release` profile [optimized] target(s) in 1.69s
+#11 DONE 1.9s
+
+#14 [stage-1 4/4] COPY --from=builder /src/target/release/http-hello /app/http-hello
+#14 DONE 0.0s
+
+#15 exporting to image
+#15 exporting layers done
+#15 writing image sha256:451cdd4cf7f8ee4cec8dd04857713aec411f1388e047d55379f41b29d4789ca3 done
+#15 naming to docker.io/library/http-hello-native done
+#15 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/p6sgzbyqsknmwhk8byvf2zamj
+
+What's Next?
+  1. Sign in to your Docker account → docker login
+  2. View a summary of image vulnerabilities and recommendations → docker scout quickview
+==== docker http-hello run at 2026-01-09T10-05-05Z ====
+image: http-hello-native
+url: http://127.0.0.1:8080/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+docker_version: Docker version 25.0.3, build 4debf41
+[measure] starting container...
+[measure] waiting for HTTP 200 from container...
+[measure] cold_start_ns=168120000
+[measure] cold_start_ms=168.120
+[measure] warmup_requests=5
+[measure] rss_kb=900 cpu_pct=/
+[measure] running 50 sequential requests...
+req=1 http_code=200 latency_ns=24726000 latency_ms=24.726
+req=2 http_code=200 latency_ns=15675000 latency_ms=15.675
+req=3 http_code=200 latency_ns=17607000 latency_ms=17.607
+req=4 http_code=200 latency_ns=12575000 latency_ms=12.575
+req=5 http_code=200 latency_ns=13064000 latency_ms=13.064
+req=6 http_code=200 latency_ns=12998000 latency_ms=12.998
+req=7 http_code=200 latency_ns=11893000 latency_ms=11.893
+req=8 http_code=200 latency_ns=25389000 latency_ms=25.389
+req=9 http_code=200 latency_ns=12798000 latency_ms=12.798
+req=10 http_code=200 latency_ns=11461000 latency_ms=11.461
+req=11 http_code=200 latency_ns=12396000 latency_ms=12.396
+req=12 http_code=200 latency_ns=11883000 latency_ms=11.883
+req=13 http_code=200 latency_ns=10798000 latency_ms=10.798
+req=14 http_code=200 latency_ns=11578000 latency_ms=11.578
+req=15 http_code=200 latency_ns=11483000 latency_ms=11.483
+req=16 http_code=200 latency_ns=11161000 latency_ms=11.161
+req=17 http_code=200 latency_ns=11263000 latency_ms=11.263
+req=18 http_code=200 latency_ns=11832000 latency_ms=11.832
+req=19 http_code=200 latency_ns=12735000 latency_ms=12.735
+req=20 http_code=200 latency_ns=12757000 latency_ms=12.757
+req=21 http_code=200 latency_ns=12593000 latency_ms=12.593
+req=22 http_code=200 latency_ns=12288000 latency_ms=12.288
+req=23 http_code=200 latency_ns=12465000 latency_ms=12.465
+req=24 http_code=200 latency_ns=11984000 latency_ms=11.984
+req=25 http_code=200 latency_ns=13223000 latency_ms=13.223
+req=26 http_code=200 latency_ns=13867000 latency_ms=13.867
+req=27 http_code=200 latency_ns=13299000 latency_ms=13.299
+req=28 http_code=200 latency_ns=12107000 latency_ms=12.107
+req=29 http_code=200 latency_ns=13561000 latency_ms=13.561
+req=30 http_code=200 latency_ns=14436000 latency_ms=14.436
+req=31 http_code=200 latency_ns=11839000 latency_ms=11.839
+req=32 http_code=200 latency_ns=12522000 latency_ms=12.522
+req=33 http_code=200 latency_ns=13118000 latency_ms=13.118
+req=34 http_code=200 latency_ns=12131000 latency_ms=12.131
+req=35 http_code=200 latency_ns=11120000 latency_ms=11.120
+req=36 http_code=200 latency_ns=12298000 latency_ms=12.298
+req=37 http_code=200 latency_ns=12469000 latency_ms=12.469
+req=38 http_code=200 latency_ns=11518000 latency_ms=11.518
+req=39 http_code=200 latency_ns=30460000 latency_ms=30.460
+req=40 http_code=200 latency_ns=27983000 latency_ms=27.983
+req=41 http_code=200 latency_ns=17719000 latency_ms=17.719
+req=42 http_code=200 latency_ns=20825000 latency_ms=20.825
+req=43 http_code=200 latency_ns=17673000 latency_ms=17.673
+req=44 http_code=200 latency_ns=15538000 latency_ms=15.538
+req=45 http_code=200 latency_ns=14120000 latency_ms=14.120
+req=46 http_code=200 latency_ns=17762000 latency_ms=17.762
+req=47 http_code=200 latency_ns=12900000 latency_ms=12.900
+req=48 http_code=200 latency_ns=13230000 latency_ms=13.230
+req=49 http_code=200 latency_ns=14290000 latency_ms=14.290
+req=50 http_code=200 latency_ns=13853000 latency_ms=13.853
+[measure] throughput_reqs=200 throughput_conc=10
+[measure] throughput_total_s=0.311617 throughput_rps=641.814
+[measure] finished run, logs in: /Users/david/Desktop/rsx207-wasm-bench/results/raw/docker/http-hello/2026-01-09T10-05-05Z_run.log
+[2026-01-09T10:05:11Z] RUN: wash down --purge-jetstream wadm
+✅ wadm stopped successfully
+✅ NATS server stopped successfully
+🛁 wash down completed successfully
+[2026-01-09T10:05:11Z] RUN: env FIREWALL_MODE=off PATH_SUFFIX=/ WARMUP_REQ=5 THROUGHPUT_REQS=200 THROUGHPUT_CONC=10 MAX_RETRIES=6000 /Users/david/Desktop/rsx207-wasm-bench/scripts/measure_wasmcloud_http_hello.sh==== wasmCloud http-hello run at 2026-01-09T10-05-11Z ====
+component_dir: /Users/david/Desktop/rsx207-wasm-bench/workloads/wasmcloud-http-hello
+url: http://127.0.0.1:8000/
+host_os: Darwin Davids-MacBook-Pro.local 25.2.0 Darwin Kernel Version 25.2.0: Tue Nov  4 20:46:55 PST 2025; root:xnu-12377.60.50.501.1~2/RELEASE_ARM64_T6030 arm64
+firewall_mode: off
+wash_version: wash          v0.42.0
+├ nats-server v2.11.3
+├ wadm        v0.21.0
+└ wasmcloud   v1.8.0
+[measure] starting wash up...
